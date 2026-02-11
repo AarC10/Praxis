@@ -51,3 +51,11 @@ class SkillStorage:
 
     def load_skill(self, name: str) -> Skill:
         pass
+
+    def _generate_skill_id(self, name: str) -> str:
+        return name.lower().replace(" ", "_")
+
+    def _get_next_version(self, skill_id: str) -> int:
+        cursor = self.db.execute("SELECT MAX(version) FROM skills WHERE skill_id = ?", (skill_id,))
+        row = cursor.fetchone()
+        return (row[0] or 0) + 1
