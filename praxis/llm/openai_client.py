@@ -88,7 +88,7 @@ class OpenAIClient(LLMClient):
             latency_ms=latency_ms,
             model=response.model,
         )
-        
+
         logger.info(f"Generated {llm_response.tokens_output} tokens in {latency_ms}ms")
         return llm_response
 
