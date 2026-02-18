@@ -53,32 +53,32 @@ class Skill:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            'skill_id': self.skill_id,
-            'name': self.name,
-            'short_desc': self.short_desc,
-            'long_desc': self.long_desc,
-            'version_id': self.version_id,
-            'version': self.version,
-            'code_path': self.code_path,
-            'contract_name': self.contract_name,
-            'inputs_schema': self.inputs_schema,
-            'outputs_schema': self.outputs_schema,
-            'termination_condition': self.termination_condition,
-            'failure_modes': self.failure_modes,
-            'category': self.category,
-            'created_at': self.created_at.isoformat(),
-            'created_by': self.created_by,
-            'status': self.status,
-            'checksum': self.checksum,
-            'generation_metadata': self.generation_metadata
+            "skill_id": self.skill_id,
+            "name": self.name,
+            "short_desc": self.short_desc,
+            "long_desc": self.long_desc,
+            "version_id": self.version_id,
+            "version": self.version,
+            "code_path": self.code_path,
+            "contract_name": self.contract_name,
+            "inputs_schema": self.inputs_schema,
+            "outputs_schema": self.outputs_schema,
+            "termination_condition": self.termination_condition,
+            "failure_modes": self.failure_modes,
+            "category": self.category,
+            "created_at": self.created_at.isoformat(),
+            "created_by": self.created_by,
+            "status": self.status,
+            "checksum": self.checksum,
+            "generation_metadata": self.generation_metadata,
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any], code: str) -> 'Skill':
+    def from_dict(cls, data: Dict[str, Any], code: str) -> "Skill":
         data = data.copy()
-        data['code'] = code
-        if 'created_at' in data and isinstance(data['created_at'], str):
-            data['created_at'] = datetime.fromisoformat(data['created_at'])
+        data["code"] = code
+        if "created_at" in data and isinstance(data["created_at"], str):
+            data["created_at"] = datetime.fromisoformat(data["created_at"])
         return cls(**data)
 
     def get_embedding_text(self) -> str:
@@ -136,6 +136,7 @@ class Skill:
 @dataclass
 class SkillMatch:
     """Result from semantic search"""
+
     skill: Skill
     distance: float  # Embedding distance (lower is more similar)
 
@@ -145,7 +146,7 @@ class SkillMatch:
         # assume cosine distance, convert to similarity
         return 1.0 - self.distance
 
-    def __lt__(self, other: 'SkillMatch') -> bool:
+    def __lt__(self, other: "SkillMatch") -> bool:
         """For sorting by similarity (higher is better)"""
         return self.distance < other.distance
 
@@ -160,11 +161,11 @@ class ExecutionResult:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            'success': self.success,
-            'data': self.data,
-            'error': self.error,
-            'exec_id': self.exec_id,
-            'latency_ms': self.latency_ms
+            "success": self.success,
+            "data": self.data,
+            "error": self.error,
+            "exec_id": self.exec_id,
+            "latency_ms": self.latency_ms,
         }
 
 
