@@ -173,7 +173,7 @@ if __name__ == "__main__":
     print(f"Using model: {llm_client.get_model_name()}")
     print(f"\n{"="*60}")
     print(f"Prompt: {args.prompt}")
-    print(f"{"="*60}\n")
+    print(f"{'='*60}\n")
 
     try:
         response = llm_client.generate(
