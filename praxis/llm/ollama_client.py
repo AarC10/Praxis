@@ -14,7 +14,7 @@ from praxis.llm_client import (
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_GENERATION_MODEL = "llama3.1:8b"
+DEFAULT_GENERATION_MODEL = "codegemma:latest"
 DEFAULT_EMBEDDING_MODEL = "mxbai-embed-large"
 DEFAULT_BASE_URL = "http://localhost:11434"
 
