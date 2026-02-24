@@ -48,23 +48,22 @@ class SkillStorage:
             ),
         )
 
-        self.db.execute(
-            """
+        self.db.execute("""
                         INSERT INTO skill_versions (version_id, skill_id, version, status,
-                                                    created_at, code_path, contract_name, checksum)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                        """,
-            (
-                version_id,
-                skill_id,
-                version,
-                skill.status,
-                skill.created_at.isoformat(),
-                code_path,
-                skill.contract_name,
-                skill.checksum,
-            ),
-        )
+                                                    created_at, code_path, contract_name,
+                                                    checksum, embedding)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            version_id,
+                            skill_id,
+                            version,
+                            skill.status,
+                            skill.created_at.isoformat(),
+                            code_path,
+                            skill.contract_name,
+                            skill.checksum,
+                            skill.embedding
+                        ))
 
         interface_id = f"{version_id}_interface"
         self.db.execute(
@@ -163,6 +162,33 @@ class SkillStorage:
             raise ValueError(f"No active version found for skill: {name}")
 
         return self.load_skill(row["version_id"])
+
+    def _row_to_skill(self, row) -> Skill:
+        """Convert database row to Skill object"""
+        code_path = self.data_dir / row['code_path']
+        code = code_path.read_text() if code_path.exists() else ""
+
+        return Skill(
+            skill_id=row['skill_id'],
+            name=row['name'],
+            short_desc=row['short_desc'],
+            long_desc=row.get('long_desc'),
+            version_id=row['version_id'],
+            version=row['version'],
+            code=code,
+            code_path=row['code_path'],
+            checksum=row['checksum'],
+            contract_name=row['contract_name'],
+            inputs_schema=json.loads(row['inputs_schema']),
+            outputs_schema=json.loads(row['outputs_schema']),
+            termination_condition=row.get('termination_condition'),
+            failure_modes=json.loads(row['failure_modes']) if row.get('failure_modes') else None,
+            category=row.get('category'),
+            created_at=datetime.fromisoformat(row['created_at']),
+            created_by=row['created_by'],
+            status=row['status'],
+            embedding=row.get('embedding')
+        )
 
     def _generate_skill_id(self, name: str) -> str:
         return name.lower().replace(" ", "_").replace("-", "_")

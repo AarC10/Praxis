@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS skill_versions (
     created_at TIMESTAMP NOT NULL,
     code_path TEXT NOT NULL,
     contract_name TEXT NOT NULL,
+    checksum TEXT,c
     embedding BLOB,
     FOREIGN KEY(skill_id) REFERENCES skills(skill_id),
     UNIQUE(skill_id, version)
