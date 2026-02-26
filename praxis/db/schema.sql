@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS skills (
     active_version_id TEXT
 );
 
-CREATE INDEX idx_skills_category ON skills(category);
-CREATE INDEX idx_skills_created_by ON skills(created_by);
+CREATE INDEX IF NOT EXISTS idx_skills_category ON skills(category);
+CREATE INDEX IF NOT EXISTS idx_skills_created_by ON skills(created_by);
 
 -- Skill versions
 CREATE TABLE IF NOT EXISTS skill_versions (
@@ -22,14 +22,14 @@ CREATE TABLE IF NOT EXISTS skill_versions (
     created_at TIMESTAMP NOT NULL,
     code_path TEXT NOT NULL,
     contract_name TEXT NOT NULL,
-    checksum TEXT,c
+    checksum TEXT,
     embedding BLOB,
     FOREIGN KEY(skill_id) REFERENCES skills(skill_id),
     UNIQUE(skill_id, version)
 );
 
-CREATE INDEX idx_versions_skill ON skill_versions(skill_id);
-CREATE INDEX idx_versions_status ON skill_versions(status);
+CREATE INDEX IF NOT EXISTS idx_versions_skill ON skill_versions(skill_id);
+CREATE INDEX IF NOT EXISTS idx_versions_status ON skill_versions(status);
 
 -- Skill interfacing contracts
 CREATE TABLE IF NOT EXISTS skill_interfaces (
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS skill_interfaces (
     FOREIGN KEY(version_id) REFERENCES skill_versions(version_id)
 );
 
-CREATE INDEX idx_interfaces_version ON skill_interfaces(version_id);
+CREATE INDEX IF NOT EXISTS idx_interfaces_version ON skill_interfaces(version_id);
 
 -- Execution log
 CREATE TABLE IF NOT EXISTS skill_executions (
@@ -52,29 +52,21 @@ CREATE TABLE IF NOT EXISTS skill_executions (
     end_time TIMESTAMP,
     exit_status TEXT CHECK(exit_status IN ('running', 'success', 'failure', 'timeout')),
     failure_reason TEXT,
-
-    -- Performance metrics
     latency_ms INTEGER,
     cpu_ms INTEGER,
     mem_peak_mb INTEGER,
-
-    -- Generation context
     llm_model TEXT,
     llm_tokens_input INTEGER,
     llm_tokens_output INTEGER,
     llm_latency_ms INTEGER,
     generation_attempts INTEGER,
-
-    -- Request context
     user_request TEXT,
-
     FOREIGN KEY(version_id) REFERENCES skill_versions(version_id)
 );
 
-CREATE INDEX idx_executions_version ON skill_executions(version_id);
-CREATE INDEX idx_executions_status ON skill_executions(exit_status);
-CREATE INDEX idx_executions_time ON skill_executions(start_time);
-CREATE INDEX idx_executions_llm ON skill_executions(llm_model);
+CREATE INDEX IF NOT EXISTS idx_executions_version ON skill_executions(version_id);
+CREATE INDEX IF NOT EXISTS idx_executions_status ON skill_executions(exit_status);
+CREATE INDEX IF NOT EXISTS idx_executions_time ON skill_executions(start_time);
 
 -- Skill artifacts
 CREATE TABLE IF NOT EXISTS skill_artifacts (
@@ -86,9 +78,9 @@ CREATE TABLE IF NOT EXISTS skill_artifacts (
     FOREIGN KEY(version_id) REFERENCES skill_versions(version_id)
 );
 
-CREATE INDEX idx_artifacts_version ON skill_artifacts(version_id);
+CREATE INDEX IF NOT EXISTS idx_artifacts_version ON skill_artifacts(version_id);
 
--- Metrics for analysis
+-- Metrics
 CREATE TABLE IF NOT EXISTS skill_metrics (
     metric_id TEXT PRIMARY KEY,
     version_id TEXT NOT NULL,
@@ -101,11 +93,10 @@ CREATE TABLE IF NOT EXISTS skill_metrics (
     FOREIGN KEY(exec_id) REFERENCES skill_executions(exec_id)
 );
 
-CREATE INDEX idx_metrics_version ON skill_metrics(version_id, metric_name);
-CREATE INDEX idx_metrics_exec ON skill_metrics(exec_id);
-CREATE INDEX idx_metrics_name ON skill_metrics(metric_name);
+CREATE INDEX IF NOT EXISTS idx_metrics_version ON skill_metrics(version_id, metric_name);
+CREATE INDEX IF NOT EXISTS idx_metrics_exec ON skill_metrics(exec_id);
 
--- Skill dependencies (for composition)
+-- Skill dependencies
 CREATE TABLE IF NOT EXISTS skill_dependencies (
     dependency_id TEXT PRIMARY KEY,
     parent_version TEXT NOT NULL,
@@ -116,5 +107,5 @@ CREATE TABLE IF NOT EXISTS skill_dependencies (
     UNIQUE(parent_version, child_version)
 );
 
-CREATE INDEX idx_dependencies_parent ON skill_dependencies(parent_version);
-CREATE INDEX idx_dependencies_child ON skill_dependencies(child_version);
+CREATE INDEX IF NOT EXISTS idx_dependencies_parent ON skill_dependencies(parent_version);
+CREATE INDEX IF NOT EXISTS idx_dependencies_child ON skill_dependencies(child_version);
