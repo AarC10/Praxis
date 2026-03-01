@@ -82,7 +82,23 @@ class SkillStorage:
             ),
         )
 
+        # Promote this version to active and demote all other prior versions
+        # Each saved version is the canonical one so the generator will createnew versions each time it refines a skill
+        self.db.execute(
+            "UPDATE skill_versions SET status = 'draft' WHERE skill_id = ? AND version_id != ?",
+            (skill_id, version_id),
+        )
+        self.db.execute(
+            "UPDATE skill_versions SET status = 'active' WHERE version_id = ?",
+            (version_id,),
+        )
+        self.db.execute(
+            "UPDATE skills SET active_version_id = ? WHERE skill_id = ?",
+            (version_id, skill_id),
+        )
+
         self.db.commit()
+        skill.status = "active"
         return version_id
 
     def load_skill(self, version_id: str) -> Skill:
@@ -101,6 +117,7 @@ class SkillStorage:
                                      sv.checksum,
                                      sv.status,
                                      sv.created_at,
+                                     sv.embedding,
                                      si.inputs_schema,
                                      si.outputs_schema,
                                      si.termination_condition,
@@ -149,7 +166,7 @@ class SkillStorage:
             skill_id=row['skill_id'],
             name=row['name'],
             short_desc=row['short_desc'],
-            long_desc=row.get('long_desc'),
+            long_desc=row['long_desc'],
             version_id=row['version_id'],
             version=row['version'],
             code=code,
@@ -158,13 +175,13 @@ class SkillStorage:
             contract_name=row['contract_name'],
             inputs_schema=json.loads(row['inputs_schema']),
             outputs_schema=json.loads(row['outputs_schema']),
-            termination_condition=row.get('termination_condition'),
-            failure_modes=json.loads(row['failure_modes']) if row.get('failure_modes') else None,
-            category=row.get('category'),
+            termination_condition=row['termination_condition'],
+            failure_modes=json.loads(row['failure_modes']) if row['failure_modes'] else None,
+            category=row['category'],
             created_at=datetime.fromisoformat(row['created_at']),
             created_by=row['created_by'],
             status=row['status'],
-            embedding=row.get('embedding')
+            embedding=row['embedding'],
         )
 
     def _generate_skill_id(self, name: str) -> str:

@@ -40,6 +40,42 @@ STANDALONE_PYTHON = SkillContract(
     ]
 )
 
+ROS_PYTHON = SkillContract(
+    name="ros_python",
+    language="python",
+    runtime="ros2",
+    required_functions=["run"],
+    function_signatures={
+        "run": {
+            "params": ["context"],
+            "returns": "dict"
+        }
+    },
+    # ROS SKills will need os/sys for fpaths and rclpy for messaging
+    # Shouldnt expect direct rclpy calls and data should be already serialzied in ctx.params
+    allowed_imports=[
+        "numpy", "cv2", "PIL", "matplotlib",
+        "scipy", "sklearn", "math", "json",
+        "time", "datetime", "collections",
+        "os", "sys", "pathlib",
+        "rclpy",
+        "sensor_msgs", "geometry_msgs", "std_msgs",
+        "nav_msgs", "cv_bridge", "tf2_ros",
+        "transforms3d", "quaternion",
+    ],
+    forbidden_imports=[
+        "subprocess", "importlib",
+        "eval", "exec", "compile", "__import__",
+    ],
+    forbidden_calls=[
+        "eval", "exec", "compile",
+        "input", "raw_input",
+    ],
+    max_lines=1000,
+    timeout_seconds=60,
+)
+
 CONTRACTS = {
     "standalone_python": STANDALONE_PYTHON,
+    "ros_python": ROS_PYTHON,
 }
