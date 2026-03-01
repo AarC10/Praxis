@@ -55,6 +55,14 @@ def _init_db(db_path: Path) -> sqlite3.Connection:
     db = sqlite3.connect(str(db_path))
     db.row_factory = sqlite3.Row
 
+    try:
+        import sqlite_vec
+        db.enable_load_extension(True)
+        sqlite_vec.load(db)
+        db.enable_load_extension(False)
+    except Exception as e:
+        _warn(f"sqlite-vec not available — semantic search disabled: {e}")
+
     schema_path = Path(__file__).parent / "db" / "schema.sql"
     if schema_path.exists():
         db.executescript(schema_path.read_text())

@@ -116,30 +116,7 @@ class SkillStorage:
         if not row:
             raise ValueError(f"Skill version not found: {version_id}")
 
-        code_path = self.data_dir / row["code_path"]
-        code = code_path.read_text()
-
-        # TODO: Has to be a better way to do this
-        return Skill(
-            skill_id=row["skill_id"],
-            name=row["name"],
-            short_desc=row["short_desc"],
-            long_desc=row["long_desc"],
-            version_id=row["version_id"],
-            version=row["version"],
-            code=code,
-            code_path=row["code_path"],
-            checksum=row["checksum"],
-            contract_name=row["contract_name"],
-            inputs_schema=json.loads(row["inputs_schema"]),
-            outputs_schema=json.loads(row["outputs_schema"]),
-            termination_condition=row["termination_condition"],
-            failure_modes=json.loads(row["failure_modes"]) if row["failure_modes"] else None,
-            category=row["category"],
-            created_at=datetime.fromisoformat(row["created_at"]),
-            created_by=row["created_by"],
-            status=row["status"],
-        )
+        return self._row_to_skill(row)
 
     def load_skill_by_name(self, name: str, version: Optional[int] = None) -> Skill:
         if version:
